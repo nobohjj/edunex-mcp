@@ -88,13 +88,13 @@ function createServer(env: Env) {
     },
     async ({ title, description, questions }) => {
       try {
-        const response = await fetch(env.GOOGLE_APPS_SCRIPT_URL, {
+        const response = await fetch(env.https://script.google.com/macros/s/AKfycbwYnDQv9pqSddFemCtvOMb9JEk3frUeMpnIU90bFsiTlJ-X_G9mzCuDLLhC-rfof8S6RA/exec, {
           method: "POST",
           headers: {
             "Content-Type": "text/plain;charset=utf-8",
           },
           body: JSON.stringify({
-            secret: env.GOOGLE_APPS_SCRIPT_SECRET,
+            secret: env.8b08d6d5-1e10-4f27-95b6-1374f3b4cacf2fb3a449-fa2f-480a-a43f-26698a3ce651,
             title,
             description,
             questions,
@@ -154,8 +154,8 @@ export default {
     );
 
     if (
-      !env.MCP_API_SECRET ||
-      suppliedSecret !== env.MCP_API_SECRET
+      !env.52c90476-6167-466c-9d62-6ef62ea9d2df791ab61d-5f10-45ff-9429-74fa4f9ac7e1 ||
+      suppliedSecret !== env.52c90476-6167-466c-9d62-6ef62ea9d2df791ab61d-5f10-45ff-9429-74fa4f9ac7e1
     ) {
       return new Response("Unauthorized", { status: 401 });
     }

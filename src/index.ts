@@ -7,6 +7,7 @@ import {
   withSupabase,
   fromSupabaseUrl,
 } from "@supabase/server";
+import { withOAuthProtectedResource } from "@supabase/server";
 
 function createServer(env: Env) {
   const server = new McpServer({
@@ -153,36 +154,22 @@ function createServer(env: Env) {
 }
 
 export default {
-  fetch: async (request, env, ctx) => {
-    const handler = createMcpHandler(() => createServer(env));
-    return handler(request, env, ctx);
-  },
-};
-      //withSupabase({
-        //auth: "user",
-        //env: {
-          //SUPABASE_URL: "https://ccybejxaaquwndxeolkc.supabase.co",
-          //SUPABASE_PUBLISHABLE_KEY:
-            //"sb_publishable_zGf9nSxAtWqucmvRG2Zbww_TKCDv5ik",
-        //},
-     // }),
-    //],
-    async (request, env, ctx) => {
-  try {
-    const handler = createMcpHandler(() => createServer(env));
-    return await handler(request, env, ctx);
-  } catch (error) {
-    console.error("EDUNEX MCP ERROR:", error);
-    return new Response(
-      JSON.stringify({
-        error: "EDUNEX_MCP_ERROR",
-        message: error instanceof Error ? error.message : String(error),
+  fetch: pipeline(
+    [
+      withOAuthProtectedResource({
+        resourceServer: (req) =>
+          new URL("/mcp", new URL(req.url).origin).toString(),
+        authorizationServer: fromSupabaseUrl(
+          "https://ccybejxaaquwndxeolkc.supabase.co"
+        ),
       }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      }
-    );
+    ],
+    async (request, env, ctx) => {
+      const handler = createMcpHandler(() => createServer(env));
+      return handler(request, env, ctx);
+    }
+  ),
+};
   }
 }
  // ),

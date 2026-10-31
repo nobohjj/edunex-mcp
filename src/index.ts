@@ -172,8 +172,22 @@ export default {
       }),
     ],
     async (request, env, ctx) => {
-      const handler = createMcpHandler(() => createServer(env));
-      return handler(request, env, ctx);
-    }
+  try {
+    const handler = createMcpHandler(() => createServer(env));
+    return await handler(request, env, ctx);
+  } catch (error) {
+    console.error("EDUNEX MCP ERROR:", error);
+    return new Response(
+      JSON.stringify({
+        error: "EDUNEX_MCP_ERROR",
+        message: error instanceof Error ? error.message : String(error),
+      }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  }
+}
   ),
 };

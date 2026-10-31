@@ -131,7 +131,7 @@ function createServer(env: Env) {
 }
 
 export default {
-  fetch: pipeline(
+  fetch: (request, env, ctx) => pipeline(
     [
       withOAuthProtectedResource({
         resourceServer: (req) =>
@@ -150,5 +150,5 @@ export default {
       const handler = createMcpHandler(() => createServer(env));
       return handler(request, env, ctx);
     }
-  ),
+    )(request, env),
 };

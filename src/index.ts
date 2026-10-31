@@ -153,18 +153,30 @@ function createServer(env: Env) {
 }
 
 export default {
-  async fetch(request: Request, env: Env, ctx: ExecutionContext) {
-    // Защита на EduNex MCP
-    const suppliedSecret = request.headers.get(
-      "x-edunex-mcp-secret"
-    );
-
-    if (
-      !env.MCP_API_SECRET ||
-      suppliedSecret !== env.MCP_API_SECRET
-    ) {
-      return new Response("Unauthorized", { status: 401 });
+  fetch: pipeline(
+    [
+      withOAuthProtectedResource({
+        resourceServer: (req) =>
+          new URL("/mcp", new URL(req.url).origin).toString(),
+        authorizationServer: fromSupabaseUrl(
+          "https://ccybejxaaquwndxeolkc.supabase.co"
+        ),
+      }),
+      withSupabase({
+        auth: "user",
+        env: {
+          SUPABASE_URL: "https://ccybejxaaquwndxeolkc.supabase.co",
+          SUPABASE_PUBLISHABLE_KEY:
+            "sb_publishable_zGf9nSxAtWqucmvRG2Zbww_TKCDv5ik",
+        },
+      }),
+    ],
+    async (request, env, ctx) => {
+      const handler = createMcpHandler(() => createServer(env));
+      return handler(request, env, ctx);
     }
+  ),
+};
 
     // Създаване на MCP handler с достъп до настройките
     const handler = createMcpHandler(() => createServer(env));

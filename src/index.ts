@@ -2,12 +2,7 @@ import { McpServer } from "@modelcontextprotocol/server";
 import { createMcpHandler } from "agents/mcp/server";
 import { z } from "zod";
 import { pipeline } from "@supabase/middleware";
-import {
-  withOAuthProtectedResource,
-  withSupabase,
-  fromSupabaseUrl,
-} from "@supabase/server";
-import { withOAuthProtectedResource } from "@supabase/server";
+import { withOAuthProtectedResource, fromSupabaseUrl } from "@supabase/server";
 
 function createServer(env: Env) {
   const server = new McpServer({
@@ -15,33 +10,23 @@ function createServer(env: Env) {
     version: "1.0.0",
   });
 
-  // TOOL 1: ADD
   server.registerTool(
     "add",
     {
       description: "Събира две числа.",
-      inputSchema: {
-        a: z.number(),
-        b: z.number(),
-      },
+      inputSchema: { a: z.number(), b: z.number() },
     },
     async ({ a, b }) => ({
       content: [{ type: "text", text: String(a + b) }],
     })
   );
 
-  // TOOL 2: CALCULATE
   server.registerTool(
     "calculate",
     {
       description: "Извършва събиране, изваждане, умножение или деление.",
       inputSchema: {
-        operation: z.enum([
-          "add",
-          "subtract",
-          "multiply",
-          "divide",
-        ]),
+        operation: z.enum(["add", "subtract", "multiply", "divide"]),
         a: z.number(),
         b: z.number(),
       },
@@ -63,10 +48,7 @@ function createServer(env: Env) {
           if (b === 0) {
             return {
               isError: true,
-              content: [{
-                type: "text",
-                text: "Грешка: делението на нула не е позволено.",
-              }],
+              content: [{ type: "text", text: "Грешка: делението на нула не е позволено." }],
             };
           }
           result = a / b;
@@ -79,7 +61,6 @@ function createServer(env: Env) {
     }
   );
 
-  // TOOL 3: CREATE GOOGLE FORM
   server.registerTool(
     "create_form",
     {
@@ -88,18 +69,14 @@ function createServer(env: Env) {
       inputSchema: {
         title: z.string().describe("Заглавие на формуляра"),
         description: z.string().describe("Описание на формуляра"),
-        questions: z.array(z.string()).describe(
-          "Списък от въпроси, всеки като отделен текст"
-        ),
+        questions: z.array(z.string()).describe("Списък от въпроси, всеки като отделен текст"),
       },
     },
     async ({ title, description, questions }) => {
       try {
         const response = await fetch(env.GOOGLE_APPS_SCRIPT_URL, {
           method: "POST",
-          headers: {
-            "Content-Type": "text/plain;charset=utf-8",
-          },
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: JSON.stringify({
             secret: env.GOOGLE_APPS_SCRIPT_SECRET,
             title,
@@ -170,4 +147,3 @@ export default {
     }
   ),
 };
-}

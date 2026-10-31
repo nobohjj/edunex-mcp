@@ -153,15 +153,11 @@ function createServer(env: Env) {
 }
 
 export default {
-  fetch: pipeline(
-    [
-      withOAuthProtectedResource({
-        resourceServer: (req) =>
-          new URL("/mcp", new URL(req.url).origin).toString(),
-        authorizationServer: fromSupabaseUrl(
-          "https://ccybejxaaquwndxeolkc.supabase.co"
-        ),
-      }),
+  fetch: async (request, env, ctx) => {
+    const handler = createMcpHandler(() => createServer(env));
+    return handler(request, env, ctx);
+  },
+};
       //withSupabase({
         //auth: "user",
         //env: {

@@ -164,8 +164,8 @@ export default {
           //SUPABASE_URL: "https://ccybejxaaquwndxeolkc.supabase.co",
           //SUPABASE_PUBLISHABLE_KEY:
             //"sb_publishable_zGf9nSxAtWqucmvRG2Zbww_TKCDv5ik",
-        },
-      }),
+        //},
+     // }),
     ],
     async (request, env, ctx) => {
   try {

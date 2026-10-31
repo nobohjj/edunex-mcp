@@ -177,10 +177,3 @@ export default {
     }
   ),
 };
-
-    // Създаване на MCP handler с достъп до настройките
-    const handler = createMcpHandler(() => createServer(env));
-
-    return handler(request, env, ctx);
-  },
-};

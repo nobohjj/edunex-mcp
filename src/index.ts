@@ -1,7 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/server";
 import { createMcpHandler } from "agents/mcp/server";
 import { z } from "zod";
-import { pipeline } from "@supabase/middleware";
+import { pipeline, getEnv } from "@supabase/middleware";
 import { withOAuthProtectedResource, fromSupabaseUrl } from "@supabase/server";
 
 function createServer(env: Env) {
@@ -141,7 +141,12 @@ export default {
         ),
       }),
     ],
-    async (request, env, ctx) => {
+    async (request, ctx) => {
+      const env = {
+        GOOGLE_APPS_SCRIPT_URL: getEnv("GOOGLE_APPS_SCRIPT_URL")!,
+        GOOGLE_APPS_SCRIPT_SECRET: getEnv("GOOGLE_APPS_SCRIPT_SECRET")!,
+      };
+
       const handler = createMcpHandler(() => createServer(env));
       return handler(request, env, ctx);
     }

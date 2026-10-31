@@ -1,6 +1,12 @@
 import { McpServer } from "@modelcontextprotocol/server";
 import { createMcpHandler } from "agents/mcp/server";
 import { z } from "zod";
+import { pipeline } from "@supabase/middleware";
+import {
+  withOAuthProtectedResource,
+  withSupabase,
+  fromSupabaseUrl,
+} from "@supabase/server";
 
 function createServer(env: Env) {
   const server = new McpServer({

@@ -166,7 +166,7 @@ export default {
             //"sb_publishable_zGf9nSxAtWqucmvRG2Zbww_TKCDv5ik",
         //},
      // }),
-    ],
+    //],
     async (request, env, ctx) => {
   try {
     const handler = createMcpHandler(() => createServer(env));

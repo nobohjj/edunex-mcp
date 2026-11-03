@@ -146,7 +146,7 @@ export default {
         GOOGLE_APPS_SCRIPT_URL: getEnv("GOOGLE_APPS_SCRIPT_URL")!,
         GOOGLE_APPS_SCRIPT_SECRET: getEnv("GOOGLE_APPS_SCRIPT_SECRET")!,
       };
-
+      console.log("EDUNEX: MCP HANDLER REACHED");
       const handler = createMcpHandler(() => createServer(env));
       return handler(request, env, ctx);
     }

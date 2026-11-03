@@ -153,9 +153,10 @@ try {
     }],
   };
 }
-
-
-
+    }
+  );
+}
+    
 export default {
   fetch: (request, env, ctx) =>
     pipeline(

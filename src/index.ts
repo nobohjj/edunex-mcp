@@ -130,57 +130,52 @@ function createServer(env: Env) {
   return server;
 }
 
+
 export default {
-  fetch: (request, env, ctx) => pipeline(
-    [
-      withOAuthProtectedResource({
-        resourceServer: (req) =>
-          new URL("/mcp", new URL(req.url).origin).toString(),
-        authorizationServer: fromSupabaseUrl(
-          "https://ccybejxaaquwndxeolkc.supabase.co"
-        ),
-      }),
-    ],
-    
-async (request, _pipelineContext) => {
-  const env = {
-    GOOGLE_APPS_SCRIPT_URL: getEnv("GOOGLE_APPS_SCRIPT_URL")!,
-    GOOGLE_APPS_SCRIPT_SECRET: getEnv("GOOGLE_APPS_SCRIPT_SECRET")!,
-  };
+  fetch: (request, env, ctx) =>
+    pipeline(
+      [
+        withOAuthProtectedResource({
+          resourceServer: (req) =>
+            new URL("/mcp", new URL(req.url).origin).toString(),
+          authorizationServer: fromSupabaseUrl(
+            "https://ccybejxaaquwndxeolkc.supabase.co"
+          ),
+        }),
+      ],
+      async (request, _pipelineContext) => {
+        const workerEnv = {
+          GOOGLE_APPS_SCRIPT_URL: getEnv("GOOGLE_APPS_SCRIPT_URL")!,
+          GOOGLE_APPS_SCRIPT_SECRET: getEnv("GOOGLE_APPS_SCRIPT_SECRET")!,
+        };
 
-  console.log("EDUNEX: MCP HANDLER REACHED");
+        console.log("EDUNEX: MCP HANDLER REACHED");
 
-  // Прочитаме JSON съдържанието предварително
-  const parsedBody =
-    request.method === "POST"
-      ? await request.clone().json()
-      : undefined;
+        const parsedBody =
+          request.method === "POST"
+            ? await request.clone().json()
+            : undefined;
 
-  console.log(
-    "EDUNEX MCP PARSED BODY:",
-    JSON.stringify(parsedBody)
-  );
+        console.log(
+          "EDUNEX MCP PARSED BODY:",
+          JSON.stringify(parsedBody)
+        );
 
-  const handler = createMcpHandler(() => createServer(env));
+        const handler = createMcpHandler(() =>
+          createServer(workerEnv)
+        );
 
-  // Подаваме вече прочетения JSON на MCP handler-а
-  const response = await handler.fetch(request, {
-    parsedBody,
-  });
+        const response = await handler.fetch(request, {
+          parsedBody,
+        });
 
-  console.log("EDUNEX MCP STATUS:", response.status);
-  console.log("EDUNEX MCP RESPONSE:", await response.clone().text());
+        console.log("EDUNEX MCP STATUS:", response.status);
+        console.log(
+          "EDUNEX MCP RESPONSE:",
+          await response.clone().text()
+        );
 
-  return response;
-}
-
-
-const response = await handler(request, env, ctx);
-
-console.log("EDUNEX MCP STATUS:", response.status);
-console.log("EDUNEX MCP RESPONSE:", await response.clone().text());
-
-return response;
-    }
+        return response;
+      }
     )(request, env),
 };

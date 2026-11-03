@@ -148,7 +148,13 @@ export default {
       };
       console.log("EDUNEX: MCP HANDLER REACHED");
       const handler = createMcpHandler(() => createServer(env));
-      return handler(request, env, ctx);
+
+const response = await handler(request, env, ctx);
+
+console.log("EDUNEX MCP STATUS:", response.status);
+console.log("EDUNEX MCP RESPONSE:", await response.clone().text());
+
+return response;
     }
     )(request, env),
 };

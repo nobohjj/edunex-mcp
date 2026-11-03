@@ -73,62 +73,87 @@ function createServer(env: Env) {
       },
     },
     async ({ title, description, questions }) => {
-      try {
-        const response = await fetch(env.GOOGLE_APPS_SCRIPT_URL, {
-          method: "POST",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({
-            secret: env.GOOGLE_APPS_SCRIPT_SECRET,
-            title,
-            description,
-            questions,
-          }),
-        });
+ 
+try {
+  const response = await fetch(env.GOOGLE_APPS_SCRIPT_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "text/plain;charset=utf-8",
+    },
+    body: JSON.stringify({
+      secret: env.GOOGLE_APPS_SCRIPT_SECRET,
+      title,
+      description,
+      questions,
+    }),
+  });
 
-        const result = await response.json() as {
-          success?: boolean;
-          title?: string;
-          formUrl?: string;
-          editUrl?: string;
-          error?: string;
-        };
+  const responseText = await response.text();
 
-        if (!response.ok || !result.success) {
-          return {
-            isError: true,
-            content: [{
-              type: "text",
-              text: "Неуспешно създаване на формуляра: " +
-                (result.error || `HTTP ${response.status}`),
-            }],
-          };
-        }
-
-        return {
-          content: [{
-            type: "text",
-            text: JSON.stringify({
-              success: true,
-              title: result.title,
-              formUrl: result.formUrl,
-              editUrl: result.editUrl,
-            }),
-          }],
-        };
-      } catch {
-        return {
-          isError: true,
-          content: [{
-            type: "text",
-            text: "Неуспешна връзка с Google Apps Script API.",
-          }],
-        };
-      }
-    }
+  console.log(
+    "GOOGLE APPS SCRIPT STATUS:",
+    response.status
   );
 
-  return server;
+  console.log(
+    "GOOGLE APPS SCRIPT RESPONSE:",
+    responseText.slice(0, 1000)
+  );
+
+  let result;
+
+  try {
+    result = JSON.parse(responseText);
+  } catch {
+    return {
+      isError: true,
+      content: [{
+        type: "text",
+        text: "Google Apps Script върна невалиден JSON. HTTP: " +
+          response.status,
+      }],
+    };
+  }
+
+  if (!response.ok || !result.success) {
+    return {
+      isError: true,
+      content: [{
+        type: "text",
+        text: "Неуспешно създаване: " +
+          (result.error || `HTTP ${response.status}`),
+      }],
+    };
+  }
+
+  return {
+    content: [{
+      type: "text",
+      text: JSON.stringify({
+        success: true,
+        title: result.title,
+        formUrl: result.formUrl,
+        editUrl: result.editUrl,
+      }),
+    }],
+  };
+
+} catch (error) {
+  console.log(
+    "GOOGLE APPS SCRIPT FETCH ERROR:",
+    error instanceof Error ? error.message : String(error)
+  );
+
+  return {
+    isError: true,
+    content: [{
+      type: "text",
+      text: "Грешка при заявката: " +
+        (error instanceof Error ? error.message : String(error)),
+    }],
+  };
 }
+
 
 
 export default {

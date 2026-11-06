@@ -159,8 +159,8 @@ try {
     }
   );
 }
-console.log("EDUNEX DEBUG: create_form registered");
 return server;
+console.log("EDUNEX DEBUG: create_form registered");
     
 export default {
   fetch: (request, env, ctx) =>

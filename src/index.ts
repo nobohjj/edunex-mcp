@@ -5,6 +5,7 @@ import { pipeline, getEnv } from "@supabase/middleware";
 import { withOAuthProtectedResource, fromSupabaseUrl } from "@supabase/server";
 
 function createServer(env: Env) {
+  console.log("EDUNEX DEBUG: createServer started");
   const server = new McpServer({
     name: "EduNex Forms",
     version: "1.0.0",
@@ -20,6 +21,7 @@ function createServer(env: Env) {
       content: [{ type: "text", text: String(a + b) }],
     })
   );
+  console.log("EDUNEX DEBUG: createServer started");
 
   server.registerTool(
     "calculate",
@@ -60,6 +62,7 @@ function createServer(env: Env) {
       };
     }
   );
+  console.log("EDUNEX DEBUG: calculate registered");
 
   server.registerTool(
     "create_form",
@@ -156,6 +159,8 @@ try {
     }
   );
 }
+console.log("EDUNEX DEBUG: create_form registered");
+return server;
     
 export default {
   fetch: (request, env, ctx) =>

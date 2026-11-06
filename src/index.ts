@@ -167,9 +167,9 @@ function createServer(env: Env) {
       ],
       async (request, _pipelineContext) => {
         const workerEnv = {
-          GOOGLE_APPS_SCRIPT_URL: getEnv("GOOGLE_APPS_SCRIPT_URL")!,
-          GOOGLE_APPS_SCRIPT_SECRET: getEnv("GOOGLE_APPS_SCRIPT_SECRET")!,
-        };
+  GOOGLE_APPS_SCRIPT_URL: env.GOOGLE_APPS_SCRIPT_URL,
+  GOOGLE_APPS_SCRIPT_SECRET: env.GOOGLE_APPS_SCRIPT_SECRET,
+};
 
         console.log("EDUNEX: MCP HANDLER REACHED");
 

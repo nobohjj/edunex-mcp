@@ -152,5 +152,3 @@ function createServer(env: Env) {
   console.log("EDUNEX DEBUG: create_form registered");
   return server;
 }
-
-export default {

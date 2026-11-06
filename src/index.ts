@@ -170,6 +170,14 @@ function createServer(env: Env) {
   GOOGLE_APPS_SCRIPT_URL: env.GOOGLE_APPS_SCRIPT_URL,
   GOOGLE_APPS_SCRIPT_SECRET: env.GOOGLE_APPS_SCRIPT_SECRET,
 };
+      console.log(
+  "EDUNEX ENV CHECK:",
+  JSON.stringify({
+    urlExists: Boolean(workerEnv.GOOGLE_APPS_SCRIPT_URL),
+    secretExists: Boolean(workerEnv.GOOGLE_APPS_SCRIPT_SECRET),
+    urlIsString: typeof workerEnv.GOOGLE_APPS_SCRIPT_URL === "string",
+  })
+);
 
         console.log("EDUNEX: MCP HANDLER REACHED");
 

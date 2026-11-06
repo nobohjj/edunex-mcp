@@ -178,7 +178,6 @@ function createServer(env: Env) {
     mcpSecret: Boolean(getEnv("MCP_API_SECRET")),
   })
 );
-      );
 
       if (!scriptUrl || !scriptSecret) {
         return new Response(

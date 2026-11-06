@@ -5,7 +5,7 @@ import { pipeline, getEnv } from "@supabase/middleware";
 import { withOAuthProtectedResource, fromSupabaseUrl } from "@supabase/server";
 
 function createServer(env: Env) {
-  console.log("EDUNEX DEBUG: createServer started");
+  console.log("EDUNEX DEBUG: add registered");
   const server = new McpServer({
     name: "EduNex Forms",
     version: "1.0.0",
@@ -148,6 +148,54 @@ function createServer(env: Env) {
       }
     }
   );
+  export default {
+  fetch: (request, env, ctx) =>
+    pipeline(
+      [
+        withOAuthProtectedResource({
+          resourceServer: (req) =>
+            new URL("/mcp", new URL(req.url).origin).toString(),
+          authorizationServer: fromSupabaseUrl(
+            "https://ccybejxaaquwndxeolkc.supabase.co"
+          ),
+        }),
+      ],
+      async (request, _pipelineContext) => {
+        const workerEnv = {
+          GOOGLE_APPS_SCRIPT_URL: getEnv("GOOGLE_APPS_SCRIPT_URL")!,
+          GOOGLE_APPS_SCRIPT_SECRET: getEnv("GOOGLE_APPS_SCRIPT_SECRET")!,
+        };
+
+        console.log("EDUNEX: MCP HANDLER REACHED");
+
+        const parsedBody =
+          request.method === "POST"
+            ? await request.clone().json()
+            : undefined;
+
+        console.log(
+          "EDUNEX MCP PARSED BODY:",
+          JSON.stringify(parsedBody)
+        );
+
+        const handler = createMcpHandler(() =>
+          createServer(workerEnv)
+        );
+
+        const response = await handler.fetch(request, {
+          parsedBody,
+        });
+
+        console.log("EDUNEX MCP STATUS:", response.status);
+        console.log(
+          "EDUNEX MCP RESPONSE:",
+          await response.clone().text()
+        );
+
+        return response;
+      }
+    )(request, env),
+};
 
   console.log("EDUNEX DEBUG: create_form registered");
   return server;

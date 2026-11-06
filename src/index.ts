@@ -148,6 +148,11 @@ function createServer(env: Env) {
       }
     }
   );
+
+  console.log("EDUNEX DEBUG: create_form registered");
+  return server;
+}
+  
   export default {
   fetch: (request, env, ctx) =>
     pipeline(

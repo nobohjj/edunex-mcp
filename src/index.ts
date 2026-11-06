@@ -166,6 +166,7 @@ function createServer(env: Env) {
         }),
       ],
       async (request, _pipelineContext) => {
+        console.log("EDUNEX WORKER ENV KEYS:", Object.keys(env));
         const workerEnv = {
   GOOGLE_APPS_SCRIPT_URL: env.GOOGLE_APPS_SCRIPT_URL,
   GOOGLE_APPS_SCRIPT_SECRET: env.GOOGLE_APPS_SCRIPT_SECRET,

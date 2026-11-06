@@ -201,7 +201,3 @@ function createServer(env: Env) {
       }
     )(request, env),
 };
-
-  console.log("EDUNEX DEBUG: create_form registered");
-  return server;
-}

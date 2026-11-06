@@ -154,59 +154,62 @@ function createServer(env: Env) {
 }
   
   export default {
-  fetch: (request, env, ctx) =>
-    pipeline(
-      [
-        withOAuthProtectedResource({
-          resourceServer: (req) =>
-            new URL("/mcp", new URL(req.url).origin).toString(),
-          authorizationServer: fromSupabaseUrl(
-            "https://ccybejxaaquwndxeolkc.supabase.co"
-          ),
-        }),
-      ],
-      async (request, _pipelineContext) => {
-        console.log("EDUNEX WORKER ENV KEYS:", Object.keys(env));
-        const workerEnv = {
-  GOOGLE_APPS_SCRIPT_URL: env.GOOGLE_APPS_SCRIPT_URL,
-  GOOGLE_APPS_SCRIPT_SECRET: env.GOOGLE_APPS_SCRIPT_SECRET,
-};
+  fetch: pipeline(
+    [
+      withOAuthProtectedResource({
+        resourceServer: (req) =>
+          new URL("/mcp", new URL(req.url).origin).toString(),
+        authorizationServer: fromSupabaseUrl(
+          "https://ccybejxaaquwndxeolkc.supabase.co"
+        ),
+      }),
+    ],
+    async (request, _pipelineContext) => {
+      const scriptUrl = getEnv("GOOGLE_APPS_SCRIPT_URL");
+      const scriptSecret = getEnv("GOOGLE_APPS_SCRIPT_SECRET");
+
       console.log(
-  "EDUNEX ENV CHECK:",
-  JSON.stringify({
-    urlExists: Boolean(workerEnv.GOOGLE_APPS_SCRIPT_URL),
-    secretExists: Boolean(workerEnv.GOOGLE_APPS_SCRIPT_SECRET),
-    urlIsString: typeof workerEnv.GOOGLE_APPS_SCRIPT_URL === "string",
-  })
-);
+        "EDUNEX ENV CHECK:",
+        JSON.stringify({
+          urlExists: Boolean(scriptUrl),
+          secretExists: Boolean(scriptSecret),
+        })
+      );
 
-        console.log("EDUNEX: MCP HANDLER REACHED");
-
-        const parsedBody =
-          request.method === "POST"
-            ? await request.clone().json()
-            : undefined;
-
-        console.log(
-          "EDUNEX MCP PARSED BODY:",
-          JSON.stringify(parsedBody)
+      if (!scriptUrl || !scriptSecret) {
+        return new Response(
+          "Missing Google Apps Script environment variables",
+          { status: 500 }
         );
-
-        const handler = createMcpHandler(() =>
-          createServer(workerEnv)
-        );
-
-        const response = await handler.fetch(request, {
-          parsedBody,
-        });
-
-        console.log("EDUNEX MCP STATUS:", response.status);
-        console.log(
-          "EDUNEX MCP RESPONSE:",
-          await response.clone().text()
-        );
-
-        return response;
       }
-    )(request, env),
+
+      const workerEnv = {
+        GOOGLE_APPS_SCRIPT_URL: scriptUrl,
+        GOOGLE_APPS_SCRIPT_SECRET: scriptSecret,
+      };
+
+      console.log("EDUNEX: MCP HANDLER REACHED");
+
+      const parsedBody =
+        request.method === "POST"
+          ? await request.clone().json()
+          : undefined;
+
+      const handler = createMcpHandler(() =>
+        createServer(workerEnv)
+      );
+
+      const response = await handler.fetch(request, {
+        parsedBody,
+      });
+
+      console.log("EDUNEX MCP STATUS:", response.status);
+      console.log(
+        "EDUNEX MCP RESPONSE:",
+        await response.clone().text()
+      );
+
+      return response;
+    }
+  ),
 };

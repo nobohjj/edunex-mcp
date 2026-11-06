@@ -169,11 +169,15 @@ function createServer(env: Env) {
       const scriptSecret = getEnv("GOOGLE_APPS_SCRIPT_SECRET");
 
       console.log(
-        "EDUNEX ENV CHECK:",
-        JSON.stringify({
-          urlExists: Boolean(scriptUrl),
-          secretExists: Boolean(scriptSecret),
-        })
+  "EDUNEX ALL ENV CHECK:",
+  JSON.stringify({
+    googleUrl: Boolean(getEnv("GOOGLE_APPS_SCRIPT_URL")),
+    googleSecret: Boolean(getEnv("GOOGLE_APPS_SCRIPT_SECRET")),
+    supabaseUrl: Boolean(getEnv("SUPABASE_URL")),
+    supabaseKey: Boolean(getEnv("SUPABASE_PUBLISHABLE_KEY")),
+    mcpSecret: Boolean(getEnv("MCP_API_SECRET")),
+  })
+);
       );
 
       if (!scriptUrl || !scriptSecret) {
